@@ -1,0 +1,38 @@
+ping -c 5 google.com
+sudo pacman -Sy
+pacman -S archlinux-keyring archinstall
+pacman -S archinstall
+archinstall
+sudo pacman -S xorg-server xorg-xinit
+sudo pacman -S virtualbox-guest-utils
+sudo systemctl enable vboxservice.service
+sudo pacman -S nvidia-dkms
+sudo pacman -S linux-zen-headers
+sudo pacman -S nvidia-utils
+sudo pacman -S ttf-dejavu noto-fonts noto-fonts-emoji ttf-liberation
+sudo pacman -S gst-libav gst-plugins-bad gst-plugins-good gst-plugins-ugly ffmpeg gstreamer
+sudo pacman -S hyprland kitty
+sudo pacman -S xdg-desktop-portal xdg-desktop-portal-hyprland
+sudo pacman -S wofi
+sudo pacman -S foot
+sudo pacman -S nano
+nano ~/.config/hypr/hyprland.conf
+(Alterar o kitty para o foot)
+sudo pacman -S nano
+Hyprland
+hyprctl monitors
+monitor=eDP-1, 1920x1080@60, 0x0, 1.25
+sudo pacman -S xwallpaper
+sudo pacman -S firefox vlc libreoffice-fresh gcc wget curl
+pacman -S hyprpaper
+touch ~/.config/hypr/hyprpaper.conf
+preload = /home/me/amongus.png
+wallpaper = monitor, /home/me/amongus.png
+shutdown now
+sudo pacman -Syyu
+sudo pacman -S linux-headers
+chmod 777 VBOXLinuxAdditions.run
+sudo ./VBOXLinuxAdditions.run
+hyprctl dispatch exit
+killall Hyprland
+tilix 
