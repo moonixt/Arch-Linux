@@ -1,0 +1,89 @@
+desde o kernel quebrado até o conserto da interface gráfica.
+📂 Protocolo de Recuperação: Arch Linux (Kernel Panic & Bootloader)
+Sintomas: Erro "You need to load the kernel first", boot falhando, queda em shell de emergência ou tela preta.
+Ferramentas Necessárias: Pen drive bootável (Live USB) do Arch Linux.
+FASE 1: Preparação e Acesso (Live USB)
+Boot: Inicie o PC pelo Pen Drive.
+Identificar Partições:
+Rode lsblk para achar seu disco.
+Raiz (/): A partição grande (No seu caso atual: nvme0n1p5 - 138GB).
+Boot (/boot): A partição pequena FAT32 (No seu caso atual: nvme0n1p1 - 1GB).
+Montar o Sistema:
+Bash
+# 1. Montar a Raiz
+mount /dev/nvme0n1p5 /mnt
+
+# 2. Verificar onde montar o boot (Checkar fstab)
+cat /mnt/etc/fstab | grep boot
+# (Se a saída mostrar /boot, siga o comando abaixo. Se mostrar /boot/efi, ajuste).
+
+# 3. Montar o Boot
+mount /dev/nvme0n1p1 /mnt/boot
+
+
+Conectar Internet:
+Bash
+ping -c 3 google.com
+# Se falhar: iwctl -> station wlan0 connect NOME_DA_REDE
+
+
+FASE 2: Reparo do Kernel e Bootloader (Chroot)
+Entrar no Sistema:
+Bash
+arch-chroot /mnt
+
+
+Reinstalar Kernel (Corrige arquivos vmlinuz/initramfs):
+Bash
+pacman -Syu linux
+# (Se usar kernel lts: pacman -Syu linux-lts)
+# (Se usar headers: pacman -S linux-headers)
+
+
+Reinstalar/Reparar GRUB (Se a pasta /boot/grub sumiu):
+Se o grub-mkconfig der erro de "path not found", force a reinstalação:
+Bash
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+
+
+Gerar Configuração de Boot:
+Bash
+grub-mkconfig -o /boot/grub/grub.cfg
+
+Verifique se apareceu "Found linux image" e "Found Windows Boot Manager".
+FASE 3: Interface Gráfica (Pós-Reboot)
+Se o sistema ligar mas cair em tela preta/tty (login de texto):
+Logue com seu usuário e senha.
+Verifique o Display Manager (Ly):
+O ly costuma quebrar em updates ou conflitar com TTYs.
+Bash
+# Reinstalar para garantir arquivos de serviço
+sudo pacman -S ly
+
+# Habilitar no TTY2 para evitar conflito
+sudo systemctl enable ly@tty2.service --force
+
+# Garantir target gráfico
+sudo systemctl set-default graphical.target
+
+
+Verifique Drivers (Nvidia):
+Se o ly não abrir, cheque se o módulo do kernel carregou:
+Bash
+dkms status
+# Se der erro, reinstale: pacman -S nvidia-dkms
+
+
+FASE 4: Saída Segura
+
+Bash
+
+
+exit            # Sai do Chroot
+umount -R /mnt  # Desmonta partições
+reboot          # Reinicia
+
+
+Dica de Ouro para o futuro:
+Instale o pacote timeshift. Ele cria "snapshots" do sistema antes de atualizações. Se um update quebrar o kernel, você pode voltar no tempo com um comando, sem precisar fazer tudo isso manualmente.
+Gostaria que eu explicasse como configurar o Timeshift agora que seu sistema está estável?
